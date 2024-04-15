@@ -1,0 +1,16 @@
+---
+title: ""
+subtitle: "Reproduce the model from 'Modelling association football scores' [1982]."
+author: "Yunshu Zhang"
+thanks: "Code and data are available at:https://github.com/Yunshu921/repro_microplastics_effect_on_fish.git"
+format: pdf
+editor: visual
+date: today
+date-format: long
+bibliography: references.bib
+format: pdf
+editor: visual
+---
+
+## Model
+
