@@ -366,12 +366,40 @@ filtered_data %>%
 \newpage
 # Discussion
 
-## Evolution of Information Technology
+## Evolution of U.S. Stock Market
 
-## Economic factors can influence stock return rate
+As shown in section 3, the return rate and PE rate increased year by year. What about other finical rate and we wonder the overall evolution of the stock market in U.S.From [@2], we know the information below:
+For nearly a century, the U.S. stock market has consistently delivered much higher returns than investing in debt rolls, and has in fact returned nearly six percent annually. Historically, common stocks have remained attractive to investors seeking long-term opportunities. Shiller expanded the Standard & Poor's data using the Cowles index, which adjusts for inflation using consumer prices, to show an average annual real return on equities of 6.5 per cent. This compares to an average real return of 3.6 per cent for long-term government bonds and 4.5 per cent for short-term government bonds.
+
+This proves that the stock market has greater potential than other investment since its stable high return rate. From the basic economic knowledge, when the demand increases, the price will increase and the supply will increase. In this step, we know that the price of stock increase due to high demand of investors since people want to buy stock with a high return rate. Then more and more company choose to make more stock, leading to the supply line shift to the right. That's the supply will increase to compensate the high demand. Until people think the price of stock is too high, the demand will decrease then the price of the stock will decrease in order to simulate more sales. Then it forms a positive cycle which level up the price of stock step by step. Those dynamic changes result in the fluctuations in our plots.
+
+The U.S. stock market is full of opportunities and challenges. Despite our grasp of some economic principles, investors must meticulously evaluate various risk factors before making decisions. For instance, examining historical data like the significant drop in the information technology industry, as illustrated in section 3 [@fig-1], reveals a volatile journey with numerous exits during downturns. While the overall trajectory may be upward over the long term, engaging in the stock market for short-term gains entails significant risks.
+
+Moreover, as stock prices rise, they often inflate prices across various aspects of life, necessitating consideration of inflation in investment strategies. [@2] assert that equity premium returns, though they've occurred in the past, will persist in the future, albeit potentially at levels slightly lower than historical norms. This news aims to instill confidence in investors, encouraging them to allocate more capital to the stock market.
+
+The active stock market not only fuels economic growth and prosperity but also serves as a gauge of its vitality. Therefore, it's essential for investors to remain vigilant, continuously assessing market conditions and adapting their strategies accordingly.
+
+## Economic factors can influence decision of investors
+For a seasoned stock investor, several factors influence their decision to invest, including the potential for short-term versus long-term returns. The author suggests that the decision to invest in stocks hinges on one's risk tolerance, especially when considering short-term gains. As illustrated in Section 3 [@fig-1], the Information Technology sector exhibits an overall upward trend in stock returns over the years, but it's not impervious to sudden and significant fluctuations. In the short term, such fluctuations mean considerable risks to investors' portfolios.
+
+After figuring this out, then who will stay in the stock market. Is it those who are looking for short-term benefits? No, that's just a very small percentage, most people are optimistic about the long term gains of stocks, so they don't exit easily when stocks fluctuate. This collective optimism plays a significant role in fostering the steady growth and resilience of the stock market over time.
+
+[@2] suggest that when investors perceive the stock market outlook as positive, they may undergo psychological shifts in their decision-making processes. Specifically, they may exhibit a tendency to overestimate the potential returns of their investments, imagining gains that exceed what they could possibly spend in their lifetime. This phenomenon is highlighted by an experiment where investors were asked to choose between two options: Option A represented their current lifetime wealth, while Option B represented a gambling opportunity that could potentially yield up to twice as much wealth as their current lifetime wealth. 
+
+The experiment revealed that when the probability of success in Option B was less than 80% (with a coefficient of 10), investors overwhelmingly chose to stick with Option A, rejecting the gambling opportunity in 99.8% of cases. Moreover, when the coefficient was increased to 50, indicating even higher uncertainty, investors refused the gambling option in 99.99999999995% of cases. 
+
+This evidence suggests that investors tend to prioritize stability and long-term benefits over the allure of uncertain gains, particularly when the probability of success is low.
+
 
 ## Bias and ethical concerns
 
+One potential bias is the assumption that the relationship between the two variables (industry and PE ratio) is linear. While linear regression analysis is a useful tool for identifying trends and patterns, it may not accurately reflect the complex and non-linear relationship between industry dynamics and PE ratios. Various factors, such as market sentiment, technological advancements, regulatory changes, and global economic conditions, can influence both industries and PE ratios in non-linear ways. Therefore, it's important to employ more sophisticated analytical techniques, such as non-linear regression or machine learning algorithms, to capture the intricate interplay between industry performance and PE ratios accurately.
+
+
+Also, there are ethical considerations about the interpretation and use of the analytical results. These concerns are important when analyzing World Bank data. The World Bank is a large organization that helps low- and middle-income countries around the world, and often the stock markets in these countries aren't as well developed as they could be, and what we're discussing in this article is all about stock markets within the U.S. These recommendations aren't necessarily for use globally, so if there are investors who want to try to buy stocks in their home country, they could be misled by this information, which could lead to some incalculable consequences.  
+
 ## Weaknesses and next steps
+
+This paper focuses solely on two variables(PE rate and industry) in the dataset to assess their impact on stock return rate. However, it acknowledges that this limited scope means the report is not exhaustive and may not capture all relevant factors. Similarly, the analysis is confined to the U.S. stock market, which is highly influential globally. Nevertheless, starting with the U.S. market provides a solid foundation, and it may be possible to identify commonalities with stock markets in other developed countries. Therefore, future research could explore stock markets in other countries to broaden the understanding of global market dynamics.
 
 # Reference
