@@ -1,8 +1,8 @@
-#  Revisiting the generalized linear models for MPs ingestion in fishes
+#  Analysis factors determining U.S. Stock return rate
 
 ## Overview
 
-This repo contains the code and data to produce 1) a paper which is a reproduction of https://github.com/GCov/A-Bayesian-analysis-of-the-factors-determining-microplastics-ingestion-in-fishes.git. 2) replications of the generalized linear models and some plots.
+This repo contains the code and data to produce a paper that analyzes the correlation between U.S. stock return rate and PE rate and industry in between 2010 to 2024, using data from the World Bank.
 
 ## File Structure
 
@@ -11,12 +11,11 @@ The repo is structured as:
 
 -   `inputs/llm` contains the chat history with Chat-GPT3.5.
 -   `outputs/paper` contains the files used to generate the paper, including the Quarto document - paper.qmd, the PDF of the reproduction paper - paper.pdf, and reference bibliography file - references.bib.
--   `inputs/data` contains the data file to be used for analysis and in appendix figures.
+-   `inputs/data` contains the data file to be used for analysis.
 -   `inputs/literature` contains the original paper.
--   `outputs/paper` contains the files used to generate the paper, including the Quarto document - paper.qmd, the PDF of the reproduction paper - paper.pdf, and reference bibliography file - references.bib.
--   `replication/scripts` contains the code used to replicate each of the figures.
--   `replication/plots` contains the replicated figures.
--   `replication/helper_functions` contains
+-   `outputs/data` contains three cleaned datasets.
+-   `scripts` contains the R scripts used to simulate, save and test data.
+
 
 
 
