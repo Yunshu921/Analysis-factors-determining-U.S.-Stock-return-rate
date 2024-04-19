@@ -1,16 +1,377 @@
 ---
-title: ""
-subtitle: "Reproduce the model from 'Modelling association football scores' [1982]."
+title: "Analysis factors determining U.S. Stock return rate"
 author: "Yunshu Zhang"
 thanks: "Code and data are available at:https://github.com/Yunshu921/repro_microplastics_effect_on_fish.git"
 format: pdf
+abstract: "This paper utilizes data from the World Bank to examine the relationship between U.S. Stock return rate and key indicators. By using linear regression models, it revealed a strong correlation between U.S. Stock return rate and factors such as the price-to-earnings ratio, also known as the PE ratio, is the ratio between a company's stock price and its earnings per share (EPS) and industry category. These findings are significant as they underscore the relationship between monetary policy and broader economic conditions. These findings can provide valuable guidance to investors in understanding the factors influencing Stock return rate in the U.S. and make effective investment strategies."
 editor: visual
 date: today
 date-format: long
 bibliography: references.bib
-format: pdf
-editor: visual
 ---
 
-## Model
+```{r}
+#| include: false
+#| warning: false
+#| message: false
 
+
+### Workspace setup ####
+library(ggplot2)
+library(dplyr)
+library(stargazer)
+library(reshape2)
+library(knitr)
+
+### Read data ###
+data <- read.csv(here::here("/cloud/project/inputs/data/raw_data.csv"))
+industry_data <- read.csv(here::here("/cloud/project/output/data/cleaned_data_industry.csv"))
+wide_df_data <- read.csv(here::here("/cloud/project/output/data/cleaned_data_wide_df.csv"))
+```
+
+# Introduction
+
+The U.S. stock market is known as one of the largest and most influential financial markets globally, attracting investors from all over the world. With its vast array of listed companies spanning various industries and sectors, it offers a wealth of investment opportunities to individuals and institutions alike. Investors flock to this market in search of both short-term gains and long-term wealth accumulation. There are some common investments such as stock, bond, real estate, and forex. At the same time, many international investors closely monitor the performance of the U.S. stock market to guide their investment decisions. 
+
+In this paper, we will investigate the factors influencing the return rates of the U.S. stock through a linear regression analysis. The estimand of our analysis will be on understanding how various factors impact the return rate of the U.S. Stock. We interest in factors such as industry category and PE ratio. For example, how two different industry's return rate change from the 2010 to 2024. By analyzing these variables, we found that different industry have different return rate.
+
+Unlike some literature focus on comparing different mutual funds which includes: money market funds, bond or fixed income funds, stock or equity funds, or hybrid funds [@mutual]. This paper focus on explore how diverse factors, specifically, industry category and PE ratio influence the return rate of stock.
+
+There are five chapters in this paper. This first section is introduction. Section 2 is data-related, emphasizing the strengths and limitations of the dataset. Methodologies adopted from the data set and key terminologies are also discussed. Then subsection of section 2 outlines the analysis results, primarily examining the relationship between return rate of stock and factors. In Section 3, we employ a linear regression model to further analyze these trends. Section 4 is dedicated to visualizing the model's outcomes through graphical representation and summary the result from previous analysis. Finally, the concluding section explores the factors influencing the observed trends, analysis of the bias and ethical concerns, and weakness and next steps. 
+
+
+# Data
+## Data Description and Measurement
+
+The data used in this paper is gained from the World Bank [@TWB]. In the World Bank Open Data, we can choose data category we interested in and then download the specific dataset. Also, there are various finical resources such as Yahoo! finance which is is a media company owned by Yahoo! Networks. It provides financial news, data and commentary, including stock quotes, press releases, financial reports and original content. It also offers a number of online tools for personal financial management. It publishes original stories written by its team of journalists, in addition to publishing paid partner content from other sites. The site is ranked #20 on SimilarWeb's list of the largest news and media sites [@yahoo]. We can downloaded data from the website: https://finance.yahoo.com/quote/ACGL/history?frequency=1wk. In this website, we can downloaded historical data about ACGL stock monthly from 2010 to 2024. We choose the World Bank since Databank provide the database has advanced features for selecting and slicing data sets, and executing custom queries, and data downloads. The raw dataset contains 228 different kinds of U.S. stock, each stock has 171 historical data from 2010 to 2024. And there are 17 variables. They are:\
+Qualitative measurements:\ Id means the name of stock company and different industries.\
+Quantitative measurements:\
+PE means the ratio between a company's stock price and its earnings per share.\
+RE means the a measure of the change in the price of a stock over a specific period of time, typically expressed as a percentage. Stock return reflects the return earned by investors who hold the stock during the given time frame.\
+ROE (Return on Equity): This ratio measures a company's profitability relative to its shareholder equity. It shows how much profit a company generates with the money shareholders have invested. A higher ROE indicates more efficient use of equity capital. It is a internal tool for company managers to make efficient decisions.\
+OPTOEBT (Operating Income Before Extraordinary Items): This metric represents a company's earnings from its core business operations before accounting for extraordinary items such as restructuring charges, litigation settlements and natural disasters. It gives insight into how well a company is generating profits from its primary activities, excluding one-time events listed above.\
+OCFTOOPERATEINCOME (Operating Cash Flow to Operating Income Ratio): This ratio indicates how efficiently a company converts its operating income into cash flow. It shows the proportion of operating income that's converted into cash, which is important for assessing a company's liquidity and ability to meet short-term obligations.\
+DEBTTOASSETS (Debt to Assets Ratio): This ratio measures the proportion of a company's assets financed by debt. It indicates the company's risk exposure. The formula is: Total Debt / Total Assets. A higher ratio suggests a higher degree of financial risk.\
+CURRENT (Current Ratio): This ratio evaluates a company's ability to pay its short-term liabilities with its short-term assets. It's calculated by dividing current assets by current liabilities. A ratio above 1 indicates that the company has more current assets than liabilities, implying good liquidity.\
+APTURN (Accounts Payable Turnover): This ratio measures how efficiently a company manages its accounts payable by comparing purchases to average accounts payable. It indicates how quickly a company pays off its suppliers. A higher turnover ratio suggests efficient management of accounts payable.\
+YOYEPS_BASIC (Year-over-Year Growth Rate of Basic Earnings per Share): This variable shows the percentage change in a company's earnings per share (EPS) from one year to the next. It reflects the company's growth or decline in profitability on a per-share basis over time.\
+DUPONT_ROE (DuPont ROE): The DuPont analysis breaks down ROE into three components: profitability, efficiency, and financial leverage. It helps investors understand what is driving changes in ROE over time and compare companies within the same industry.
+
+There is a limitation in this dataset. Firstly, we get all prices of different stocks after stock price adjustment. Thus there are some inconsistency between our dataset and online data in Yahoo! Finance. For instance, let's consider the case of Arch Capital Group Ltd. (ACGL) stock, which changed from 104 to 33.730 during the period from April 29, 2011, to May 31, 2011. On May 12, 2011, ACGL underwent a 3:1 stock split. This means that for every share an investor held prior to the split, they received three shares after the split. Simultaneously, the price was adjusted proportionally to maintain the same total market value of the investor's holdings. Therefore, if the stock was trading at 90 per share before the split, it might now trade at 30 per share after the split. This adjustment explains why the price of the stock decreased from 104 to 33.730.
+
+For the measurement used in this dataset, the World Bank follows a strict manner to collect data from authoritative sources. They will do data validation, standardization and dissemination, and then they aggregates and analyzes data to recognize patterns and offer guidance for policy decisions. 
+```{r}
+#| echo: false
+#| warning: false
+#| label: tbl-data
+#| tbl-cap: "A summary table of cleaned data"
+
+selected_data <- read.csv(here::here("output/data/cleaned_data.csv"))
+kable(head(selected_data[, 1:4]))
+```
+
+@tbl-data shows first ten row of selected data from cleaned dataset, which includes 6 variables and 38988 observations. The variables are date (in month), industry, pe that is PE ratio (in percentage), ret that is the return rate (in percentage), marketvalue and optoebt (in dollars).
+
+In this paper, we use `R` [@citeR], `reshape2` [@reshape2], `dplyr` [@dp], `stargazer` [@stargazer], `lmtest` [@lmtest] and `ggplot2` [@gg2].
+
+
+## Data Visualization
+
+### Whether the industry is an important factor of return rate
+
+Now, we wonder if the category of industry influence the return rate.
+
+\newpage
+```{r}
+#| label: fig-1
+#| fig-cap: Overall increase in return rate from 2010 to 2024 for Financials and Information Technology
+#| echo: false
+#| warning: false
+
+### Workspace setup ####
+library(ggplot2)
+library(dplyr)
+library(stargazer)
+library(reshape2)
+
+### Read data ###
+data <- read.csv(here::here("/cloud/project/inputs/data/raw_data.csv"))
+grouped_data <- data %>%
+  group_by(industry,date) %>%
+  summarize(avg_returns = mean(ret), .groups = "drop")
+
+wide_df <- dcast(grouped_data, date ~ industry, value.var = "avg_returns")
+adjusted_data = grouped_data[grouped_data$industry %in% c('Information Technology', 'Financials'), ]
+wide_df <- dcast(adjusted_data, date ~ industry, value.var = "avg_returns")
+input_data <- apply(wide_df[, -1], 2, function(x) cumprod(1 + x))
+input_data = as.data.frame(input_data)
+input_data$date=wide_df[, 1]
+df <- melt(input_data, id.vars = 'date', variable.name = 'Industry')
+input_data$date=wide_df[, 1]
+input_data <- na.omit(input_data)
+input_data$date <- as.Date(input_data$date)
+
+### Make the plot ###
+p_line <- ggplot(input_data) +
+  geom_line(aes(x = date, y = Financials , color = "Financials"), show.legend = TRUE) +
+  geom_line(aes (x = date , y =`Information Technology`, color = "Information Technology"), show.legend = TRUE) +
+  labs(title = "Financials vs Information Technology",
+       x = "Year",
+       y = "Return Rate") +
+  scale_color_manual(values = c("pink", "lightblue"),
+                     name = "Legend",
+                     labels = c("Financials", "Information Technology"))
+
+p_line
+```
+
+@fig-1 shows the overall trend of return rate of Financials and Information Technology from 2010 to 2024. The overall trend of this figure shows a increase in both industry over years. From 2010 to 2024, for Information Technology, the return rate of this industry increased from 5% in 2020 to 12.5% 2024 approximately. Compared to financials, whose return rate increased from 3.75% in 2020 to 5.625% 2024 approximately. Although the return rate fluctuates along with time, specially for Information Technology, it has a huge drop from 11% to 7.5% approximately around 2021. The overall tendency for return rate is rising and this finding can give the investors some confidence that they can trust the future of stock market. \
+
+\newpage
+
+
+### Whether the PE is an important factor of return
+```{r}
+#| label: fig-2
+#| fig-cap: Overall increase in return rate from 2010 to 2024 during the change of PE
+#| echo: false
+#| warning: false
+
+
+data_frame <- data %>%
+  group_by(date) %>%
+  mutate(group = ntile(pe, 5))
+
+grouped_data <- data_frame %>%
+  group_by(group, date) %>%
+  summarize(avg_returns = mean(ret),.groups = "drop")
+
+wide_df <- dcast(grouped_data, date ~ group, value.var = "avg_returns")
+input_data2 <- apply(wide_df[, -1], 2, function(x) cumprod(1 + x))
+input_data2 = as.data.frame(input_data2)
+
+new_col_names <- paste("new_group", 1:5, sep = "")
+colnames(input_data2) <- new_col_names
+input_data2$date = wide_df[, 1]
+df <- melt(input_data2, id.vars = 'date', variable.name = 'group')
+df = df[df$group %in% c('new_group1', 'new_group5'), ]
+
+input_data2 <- na.omit(input_data2)
+input_data2$date <- as.Date(input_data2$date)
+
+p_line <- ggplot(input_data2) +
+  geom_line(aes(x = input_data2[,6], y = input_data2[,1], color = "red"), show.legend = TRUE) +
+  geom_line(aes(x = input_data2[,6], y = input_data2[,5], color = "lightgreen"), show.legend = TRUE) +
+  labs(title = "High PE vs Low PE",
+       x = "Date",
+       y = "Return Rate") +
+  scale_color_manual(values = c("red", "lightgreen"),
+                     name = "Category",
+                     labels = c("high PE", "low PE"))
+p_line
+
+
+
+```
+
+In @fig-2, the x axis can be transferred to date of time that is from 2010 to 2024. It shows the overall trend of return rate of high PE stock and low PE stock from 2010 to 2024. The overall trend of this figure shows a increase in both industry over years. From 2010 to 2024, for low PE stock, the return rate increased from 1% in 2010 to 1.5% 2024 approximately. Compared to high PE stock, whose return rate increased from 1% in 2020 to 2% 2024 approximately. For this two conditions, even though there is a difference in overall rise in return rate, the scope of changing is not enormous. In this way, investors could consider low PE stock for some situation. In addition, we can find that high PE stock which in red line always has higher return rate than low PE stock that in green line. At the same time, one observation is fluctuations happened in low PE stock more frequently than high PE stock. This indicates the importance of maintaining the high PE, since high PE implies stability to some extent.\
+
+# Model
+After conducting exploratory analysis on the dataset, we've identified a positive correlation between stock return rates and industry and PE rate. Both variables exhibit an upward trend, suggesting a potential linear relationship. Firstly, we want to check if there are correlations among variables we interested.
+```{r}
+#| echo: false
+#| warning: false
+#| label: tbl-2
+#| tbl-cap: "Correlation matrix of four variables: return rate, market value, Operating Income Before Extraordinary Items and PE rate"
+# Subset data to include only relevant variables
+subset_data <- data[c("ret", "marketvalue", "optoebt","pe")]
+# Calculate correlation matrix
+correlation_matrix <- cor(subset_data)
+# Print correlation matrix
+print(correlation_matrix)
+
+```
+In @tbl-2, we can make sure that there is no correlation among four variables: return rate, market value, operating income before extraordinary items and PE rate.
+
+Next we show several linear regression models:
+```{r}
+#| echo: false
+#| warning: false
+
+
+# Which factor impact the most
+
+# Analyze Correlations
+
+data_filtered <- data[data$date < as.Date("2024-01-01"), ]
+data_filtered<- data_filtered %>%
+  arrange(id, date)
+# Calculate cumulative returns by group
+data_filtered<-data_filtered %>%
+  group_by(id) %>%
+  mutate(cumulative_ret = cumprod(1 + ret) - 1)
+# Rebuild Model
+data_filtered_standardized <- data_filtered  # Create a copy of the original data frame
+data_filtered_standardized[, c("cumulative_ret", "pe", "marketvalue", "optoebt")] <- scale(data_filtered[, c("cumulative_ret", "pe", "marketvalue", "optoebt")])
+
+# Estimate the regression models
+model1 <- lm(cumulative_ret ~ pe + marketvalue + optoebt, data = data_filtered_standardized)
+model2 <- lm(cumulative_ret ~ marketvalue + optoebt, data = data_filtered_standardized)
+model3 <- lm(cumulative_ret ~ marketvalue, data = data_filtered_standardized)
+```
+## Model 1
+$$ 
+Y_1 = β_0 + β_1X_1 + β_2X_2 + β_3X_3+ ε
+$$
+where:
+
+-   $Y_{1}$ is the return rate.
+-   $X_{1,2,3}$ are PE rate = 0.0587, marketvalue = 0.180, and optoebt = -0.00106
+-   $\beta_0$ is the intercept or constant term, which represents the expected value of return rate when all X variables equal to zero.
+-   $\beta_1$ is the slope coefficient or the estimated change in return rate for a one-unit increase in the PE rate.
+-   $\beta_2$ is the slope coefficient or the estimated change in return rate for a one-unit increase in the marketvalue.
+-   $\beta_3$ is the slope coefficient or the estimated change in return rate for a one-unit increase in the optoebt.
+-   $\epsilon$ is the error term or the deviation of the actual value of return rate from the predicted value based on the regression equation.
+
+
+## Model 2
+$$ 
+Y_2 = β_0 + β_1X_1 + β_2X_2 + ε
+$$
+where:
+
+-   $Y_{2}$ is the return rate.
+-   $X_{1,2}$ are marketvalueand and optoebt.
+-   $\beta_0$ is the intercept or constant term, which represents the expected value of return rate when all X variables equal to zero.
+-   $\beta_1$ is the slope coefficient or the estimated change in return rate for a one-unit increase in the marketvalue.
+-   $\beta_2$ is the slope coefficient or the estimated change in return rate for a one-unit increase in the optoebt.
+-   $\epsilon$ is the error term or the deviation of the actual value of return rate from the predicted value based on the regression equation.
+
+## Model 3
+
+$$ 
+Y_3 = β_0 + β_1X_1 + ε
+$$
+where:
+
+-   $Y_{3}$ is the return rate.
+-   $X$ are marketvalue for stock.
+-   $\beta_1$ is the slope coefficient or the estimated change in return rate for a one-unit increase in the marketvalue.
+-   $\beta_0$ is the intercept or constant term, which represents the expected value of return rate when the marketvalue equal to zero.
+-   $\epsilon$ is the error term or the deviation of the actual value of return rate from the predicted value based on the regression equation.
+
+## Model 4
+
+$$ 
+Y_1 = β_0 + β_1X_1 + β_2X_2 + β_3X_3 + β_4X_4 + ε
+$$
+where:
+
+-   $Y_{1}$ is the return rate.
+-   $X_{1,2,3,4}$ are PE rate, marketvalue, optoebt and the fourth variable gets 1 or 0. Specifically, if the industry is Information Technology we get 1, otherwise we get 0.
+-   $\beta_0$ is the intercept or constant term, which represents the expected value of return rate when all X variables equal to zero.
+-   $\beta_1$ is the slope coefficient or the estimated change in return rate for a one-unit increase in the PE rate.
+-   $\beta_2$ is the slope coefficient or the estimated change in return rate for a one-unit increase in the marketvalue.
+-   $\beta_3$ is the slope coefficient or the estimated change in return rate for a one-unit increase in the optoebt.
+-   $\beta_4$ is the slope coefficient or the estimated change in return rate for a one-unit increase in the IT_industry.
+-   $\epsilon$ is the error term or the deviation of the actual value of return rate from the predicted value based on the regression equation.
+
+
+
+# Result
+## Model result
+```{r}
+#| echo: false
+#| warning: false
+#| label: tbl-model1
+#| tbl-cap: "Summary of model 1"
+
+# Estimate the regression models
+model1 <- lm(cumulative_ret ~ pe + marketvalue + optoebt, data = data_filtered_standardized)
+model2 <- lm(cumulative_ret ~ marketvalue + optoebt, data = data_filtered_standardized)
+model3 <- lm(cumulative_ret ~ marketvalue, data = data_filtered_standardized)
+kable(summary(model1)$coefficients, format = "markdown")
+
+
+```
+```{r}
+#| echo: false
+#| warning: false
+#| label: tbl-model2
+#| tbl-cap: "Summary of model 1"
+
+kable(summary(model2)$coefficients, format = "markdown")
+```
+```{r}
+#| echo: false
+#| warning: false
+#| label: tbl-model3
+#| tbl-cap: "Summary of model 1"
+ 
+kable(summary(model3)$coefficients, format = "markdown")
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: tbl-model4
+#| tbl-cap: "Summary of model 4"
+
+
+data <- data %>%
+  mutate(IT_industry = ifelse(industry == "Information Technology", 1, 0))
+data<- data %>%
+  arrange(id, date)
+# Calculate cumulative returns by group
+data_filtered<-data %>%
+  group_by(id) %>%
+  mutate(cumulative_ret = cumprod(1 + ret) - 1)
+model4 <- lm(cumulative_ret ~ pe + marketvalue + optoebt + IT_industry , data = data_filtered)
+kable(summary(model4)$coefficients, format = "markdown")
+
+```
+@tbl-model1 shows $\beta_0$ = 0.0174, $\beta_1$ = 0.0588, $\beta_2$ = 0.180, and $\beta_3$ = -0.0011
+
+@tbl-model2 shows $\beta_0$ = 0.0166, $\beta_1$ = 0.181, and $\beta_2$ = -0.0006
+
+@tbl-model3 shows $\beta_0$ = 0.0000, and $\beta_1$ = 0.162
+
+@tbl-model4 shows $\beta_0$ = 1.7140, $\beta_1$ = 0.0005, $\beta_2$ = 0.0000, and $\beta_3$ = -0.0000067, and $\beta_4$ = 1.6452908
+
+Summary all the results from four tables, we can conclude that PE rate and category industry: Information Technology have positive linear correlation with return rate.
+
+```{r}
+#| label: fig-3
+#| fig-cap: "The model that shows the relationship between PE rate and Stock Return Rate"
+#| echo: false
+#| warning: false
+
+library(ggplot2)
+
+data <- na.omit(data)
+filtered_data <- data %>%
+  filter(pe >= quantile(pe, 0.05) & pe <= quantile(pe, 0.95) &
+         ret >= quantile(ret, 0.05) & ret <= quantile(ret, 0.95))
+filtered_data %>%
+  ggplot(aes(x = `pe`, y = `ret`)) +
+  geom_point(alpha = 0.15) +
+  geom_smooth(method = "lm", se = TRUE, color = "black", linetype = "dashed") +
+  labs(x = "PE rate (percentage)", y = "Stock Return Rate (percentage)",
+       title = "Relationship between PE rate and Stock Return Rate") +
+  theme_classic()
+
+```
+@fig-3 shows a fitted graph of the linear regression model illustrating the relationship between the Price-to-Earnings (PE) rate and Stock Return Rate. The plot shows the trend of stock return rate concerning changes in the PE rate. A positive relationship would suggest that as the PE ratio increases, so does the stock return rate. The regression line should confirm this trend, indicating a statistically significant positive slope.
+
+\newpage
+# Discussion
+
+## Evolution of Information Technology
+
+## Economic factors can influence stock return rate
+
+## Bias and ethical concerns
+
+## Weaknesses and next steps
+
+# Reference

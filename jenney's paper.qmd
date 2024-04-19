@@ -1,0 +1,244 @@
+---
+title: "Analyzing the Relationship between Increased Employment Rates and Higher Permanent Immigrant Inflows"
+subtitle: "An Analysis of Canada's Employment Rate and Permanent Immigrant Inflows"
+author: 
+  - Jenny Shen
+thanks: "Code and data are available at: https://github.com/jennyshen-playground/analysis_of_employment_rate_perminant_immigrant_inflows.git."
+date: "`r Sys.time()`"
+date-format: "D MMMM YYYY"
+format: 
+  pdf:
+    documentclass: article
+    geometry: margin = 1in
+    abstract: "This paper utilizes data from the OECD to examine the relationship between Canada's employment rate and permanent immigrant inflows between 2009 to 2019. The analysis revealed a positive correlation between the two variables, indicating that as the employment rate increased, so did permanent immigrant inflows. These findings matter as they highlight the importance of a strong labor market and economic development in attracting and retaining permanent immigrants. The insights can guide policymakers in developing policies to attract and retain permanent immigrants."
+number-sections: true
+bibliography: references.bib
+---
+
+# Introduction
+
+Immigration has been a key driver of economic growth and cultural diversity for countries around the world. Over the past two decades, many countries have opened doors to immigration, recognizing the significant economic and social benefits that immigration can bring. However, immigration policies and their implementation have varied across countries, with some facing challenges in attracting and retaining permanent immigrants. One possible factor that could influence a country's ability to attract and retain immigrants is its employment rate. High employment rates means that the country has economic stability and job opportunities, making a country a more attractive destination for permanent immigrants. Whereas, low employment rates could signal economic instability, leading to a decrease in permanent immigrant inflows.
+
+In this paper, we will examine the relationship between Canada's employment rate and permanent immigrant inflows through a linear regression analysis. The estimand here is how employment rate and immigrants inflows are related. Specifically, we will focus on Canada, which has a relatively high immigration number. We will draw data from the OECD website [@OECD]. Our respondents of interest are the percentage of the working-age population, as they represent the potential labor force and have a significant impact on a country's economic growth and development. Based on the analysis, we found that there is a positive relationship between employment rate and permanent inflow rate.
+
+While existing literature has examined the impact of economic factors on immigration, this paper specifically focuses on the relationship between employment rate and permanent immigrant inflows.This exploration can provide valuable insights for government oﬀicials and policy makers in developing policies to attract and retain permanent immigrants and influencing permanent immigrant inflows. In addition, this research can impact economic development strategies which can benefit the labour market and immigration.
+
+In section 1, we discuss the source of data used in this paper, the strengths and weaknesses of OECD, methodologies that follow it, and data terminology. In section 2, we present the results of our analysis, focusing on the trajectory of employment rate and permanent immigrant inflows over the past 10 years in Canada. In section 3, we will analyze the trend by establishing a linear regression model. In section 4 we will present the result of the model in a graph. In the final section, we explore the factors that contribute to permanent immigrant inflows, and we will examine the patterns and trends to highlight the similarities and differences in immigration patterns, analysis of the bias and ethical concerns, and weakness and steps.
+
+# Data {#sec-data}
+
+## Data Description and Methodology
+
+The data used in this paper is obtained from the OECD Data (Organization for Economic Co-operation and Development) and is publicly available through the OECD website [@OECD]. Founded in 1961, the OECD is an intergovernmental organisation with 38 member countries collaborating to develop policy standards to promote sustainable economic growth. The organization's data is widely used by policymakers, researchers, and analysts to understand trends and inform policy decisions. The OECD has collected data regarding economy, education, employment, environment, health, tax, trade, GDP, unemployment rate, and inflation. It keeps records on a monthly, quarterly, and yearly data from the participating countries.
+
+The OECD collects data through member countries, partner organizations, and surveys. One of the primary sources of data for the OECD is its member countries, which provide data on a regular basis across a wide range of indicators, including GDP, employment, education, health, and the environment. This data is then aggregated and analyzed by the OECD to identify trends and inform policy recommendations.
+
+The three datasets that I will be using are: Permanent immigrant inflows [@OECDPermanent], Employment Rate [@OECDemployment], and Population [@OECDPopulation]. All of them will be specifically Canada and have evolved from 2009 to 2019. Permanent immigrant inflows cover regulated movements of foreigners considered to be settling in the country from the perspective of the destination country. The data presented are the result of a standardization process in Canada. The number of variables recorded in the data was 253 101 in 2009, 262 773 in 2013, and 341 173 in 2019. Employment rates are a measure of the extent to which available labour resources (people available to work) are being used. They are calculated as the ratio of the employed to the working age population. The working age population refers to people aged 15 to 64. The percentage of variables recorded in the data was 71.5 in 2009, 2.7 in 2013, and 74.6 in 2019. Finally, the population is defined as all nationals present in, or temporarily absent from a country, and aliens permanently settled in a country. This indicator shows the number of people that usually live in an area. Growth rates are the annual changes in population resulting from births, deaths, and net migration during the year. 
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+
+#### Initialize quarto workspace by reading csv's ####
+library(tidyverse)
+library(here)
+library(readr)
+library(ggplot2)
+
+employment_rate_cleaned <- read_csv(here::here("inputs/data/employment_rate_cleaned.csv"))
+total_population_cleaned <- read_csv(here::here("inputs/data/total_population_cleaned.csv"))
+merged_data <- read_csv(here::here("inputs/data/merged_data.csv"))
+
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: tbl-data
+#| tbl-cap: "A summary table of cleaned data"
+
+library(knitr)
+kable(merged_data)
+
+```
+
+@tbl-data presents the cleaned dataset, which includes 11 variables and 5 observations in total. The variables in the dataset include Year (in years), Country, Employment Rate (in percentage), Permanent Immigrant Rate (in percentage). The Permanent Inflows Rate was calculated by dividing the Permanent Immigrant Flows by the Total Population of Canada. All percentages are based on the corresponding population for each variable.
+
+In this paper, the analysis will be carried out using the statistical programming language `R` [@citeR], using the haven and `tidyverse` [@citeTidy], `devtools` (Wickham, Hester, and Chang 2020) and `dplyr` (Wickham et al. 2021),. All figures in the report are generated using `ggplot2` [@citeGG]. We run the model in R [@citeR] using the `rstanarm` package of [@rstanarm].
+
+## Data Visualization
+
+### Permanent Immigrants Inflows Rate from 2009 to 2019
+
+```{r}
+#| label: fig-1
+#| fig-cap: Overall increase in Canada’s permanent immigration inflow from 2009 to 2019 which is from 0.751 to 0.925.
+#| echo: false
+#| warning: false
+
+library(ggplot2)
+library(dplyr)
+
+merged_data %>%
+  group_by(Year) %>%
+  ggplot(aes(x = Year, y = `Permanent Inflows Rate`)) +
+  geom_line(group = 1, color = "red") +
+  scale_x_continuous(breaks = seq(2009, 2019, by = 1), labels = c("2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019")) +
+  theme_bw() +
+  labs(
+    title = "Permanent Immigrants Inflows Rate from 2009 to 2019",
+    x = "Year",
+    y = "Permanent Immigrants Inflows Rate" 
+  )
+
+```
+
+@fig-1 shows the overall trend of permanent immigrant inflows in Canada between 2009 and 2019. The overall trend of the plot shows an increasing pattern in permanent immigration inflow rate over the years, with fluctuations. From 2009 to 2019, the permanent immigrant inflow rate increased from 0.751 to 0.925. Furthermore, there have been fluctuations in the permanent immigrant inflow rate over time, the overall trend has been upward, with a notable rise in the rate following a decline from 0.85 to 0.71 in 2011. This trend highlights the increasing importance of immigration as a driver of economic and social growth in OECD member countries. These trends and analyzing the underlying drivers can provide valuable insights into the impacts of immigration on its member countries and help inform policy decisions related to immigration and integration.\
+
+\newpage
+
+### Employment Rate from 2009 to 2019
+
+```{r}
+#| label: fig-2
+#| fig-cap: "Trend of employment rate in Canada between 2009 and 2019."
+#| echo: false
+#| warning: false
+merged_data %>%
+  group_by(Year) %>%
+  mutate(`Employment Rate` = sum(`Employment Rate`, na.rm = TRUE)) %>%
+  ggplot(aes(x = Year, y = `Employment Rate`)) +
+  geom_line(group = 1, color = "blue") +
+  scale_x_continuous(breaks = seq(2009, 2019, by = 1), labels = c("2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019")) +
+  theme_bw() +
+  labs(
+    title = "Employment Rate in Canada from 2009 to 2019",
+    x = "Year",
+    y = "Employment Rate" 
+  )
+
+```
+
+@fig-2 shows the overall trend of employment rate of the working age population in Canada between 2009 and 2019. The overall trend of the plot shows a positive upward trajectory in Canada's employment rate over the years, with minor fluctuations. The vertical axis shows the employment rate, while the horizontal axis displays the years. Overall, there is an increasing pattern in the employment rate. From 2009 to 2019, Canada's employment rate increased from 71.5 to 74.6, indicating steady growth. Notably, the employment rate has been increasing consistently from 2016 to 2019, which is a promising sign for the Canadian labor market. This trend suggests that Canada is experiencing improved economic conditions, which are leading to job creation and employment opportunities for its citizens. Analyzing the employment trends can provide valuable insights into the factors that drive employment growth and inform policy decisions related to labour market development.
+
+\newpage
+
+# Model
+
+After conducting exploratory analysis on the dataset, we have observed a positive correlation between the permanent immigrant inflows and the employment rate. Both variables show an increasing trend, indicating a potential linear relationship. To gain further insights and make predictions about future economic growth and immigration, we will be implementing a linear regression model.
+
+The final model is displayed here.
+
+$$ 
+Yij = β0 + β1Xij + εij
+$$
+
+where:
+
+-   $Y_{ij}$ is the Permanent Inflow Rate for observation j in year i.
+-   $X_{ij}$ is the Employment Rate for observation j in year i.
+-   $\beta_0$ is the intercept or constant term, which represents the expected value of Permanent Inflow Rate when the Employment Rate is equal to zero.
+-   $\beta_1$ is the slope coefficient or the estimated change in Permanent Inflow Rate for a one-unit increase in the Employment Rate.
+-   $\epsilon_{ij}$ is the error term or the deviation of the actual value of Permanent Inflow Rate from the predicted value based on the regression equation.
+
+The goal of the linear regression model is to estimate the values of β0 and β1 such that the model fits the data well and to predict the expected value of the Permanent Inflows Rate for different values of the Employment Rate. The statistical significance of β1 can be assessed using a t-test, which tests whether the estimated coefficient is significantly different from zero. If the p-value of the t-test is less than a chosen significance level, we can conclude that there is a significant relationship between the Employment Rate and the Permanent Inflows Rate.
+
+\newpage
+
+# Results
+
+```{r}
+#| label: fig-3
+#| fig-cap: "The model that shows the relationship between Employment Rate and Permanent Immigrant Inflow Rate"
+#| echo: false
+#| warning: false
+
+library(ggplot2)
+
+merged_data %>%
+  ggplot(aes(x = `Employment Rate`, y = `Permanent Inflows Rate`)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = TRUE, color = "black", linetype = "dashed") +
+  labs(x = "Employment Rate (percentage)", y = "Permanent Inflows Rate (percentage)",
+       title = "Relationship between Employment Rate and Permanent Inflows Rate") +
+  theme_classic()
+
+```
+
+@fig-3 illustrates a fitted graph of the linear regression model, where the line represents the trend of employment rate in respect to permanent immigrant inflows rate. The plot suggests a positive relationship between the two variables: as employment rate increases, so does the permanent immigrant inflows rate. The regression line confirms this trend, with a positive slope that is statistically significant. This suggests that employment rate is a significant predictor of permanent immigrant inflows rate in Canada. Overall, the plot and regression line provide strong evidence for the positive relationship between employment rate and permanent immigrants inflows rate, as well as the importance of employment in shaping Canada's immigration patterns.
+
+\newpage
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: tbl-model
+#| tbl-cap: "A summary table of the linear regression model"
+
+library(modelsummary)
+
+merged_data <-
+  merged_data |>
+  mutate(Centred_Employment_Rate = `Employment Rate` - mean(merged_data$`Employment Rate`))
+
+merged_data_centered_model <-
+  lm(
+    `Permanent Inflows Rate` ~ `Employment Rate`,
+    data = merged_data
+  )
+
+modelsummary::modelsummary(
+  list("Employment Rate" = merged_data_centered_model),
+  fmt = 2
+)
+
+```
+
+@tbl-model displays the coefficients of the predictor variables of the linear regression model. All the variables included in the model have p-values less than 0.05, indicating that they have a significant impact on the permanent immigrant inflows rate. Therefore, all the variables are retained in the final model. For every 1% increase in the Employment Rate, there is a 0.04% increase in the Permanent Inflows Rate. The relationship between Employment Rate and Permanent Inflows Rate is positive, which means that as the Employment Rate increases, the Permanent Inflows Rate also tends to increase. The slope coefficient of 0.04 indicates that for every 1% increase in the Employment Rate, we can expect a 0.04% increase in the Permanent Inflows Rate, all else being equal. As the "Year" variable increases by 1, the estimated permanent immigrant inflow increases by 0.04% on average, holding other predictor variables constant. However, it is important to note that this is a correlation and does not necessarily imply causation. Other factors, such as government policies and global economic conditions, may also have an impact on Permanent Inflows Rate.
+
+# Discussion
+
+## **Evolution of Immigrants flow by year** {#sec-first-point}
+
+In section 3, we discussed the overall trend of permanent immigrant inflow rate in Canada. Between 2009 and 2019, this inflow rate increased from 0.751 to 0.925, which represents a significant increase in the number of immigrants who are choosing Canada as their new home. This trend is partly due to Canada's proactive immigration policies and initiatives, which aim to attract highly skilled and educated immigrants who can contribute to the country's economy and society.
+
+Legislation enacted in the 1960s and 1970s established the framework for Canada's current immigration process, which welcomes multiculturalism [@CFRimmigration]. The government's support for cultural diversity was originally expressed in a 1971 policy, and legislation in 1976 clearly codified Canada's commitment to refugees, demanding that federal and provincial authorities create immigration objectives jointly. It also portrayed immigration as a vehicle for achieving the country's cultural, economic, and social goals. Over the last few decades, Canada has earned a reputation for accepting immigrants and appreciating multiculturalism. Foreign-born persons account for over one-quarter of Canada's population, the greatest proportion in more than 150 years and one of the highest ratios among industrialized Western nations.
+
+According to Statistics Canada, Canada's immigration system operates with three primary goals in mind: to promote economic development by attracting skilled and educated immigrants who can contribute to the country's economy; to reunite families by facilitating the sponsorship of spouses, children, and other family members; and to fulfill the country's international obligations and uphold its humanitarian tradition [@StatCan2021]. One key data that public decision-makers, employers, and providers of healthcare, education, justice, and other services use is Census data, which address the needs of immigrants in Canada.
+
+Canada's immigration system is also designed to be fair and inclusive, welcoming individuals from all backgrounds and nationalities. The increase in the permanent immigrant inflow rate also reflects the changing global landscape, as more individuals seek to leave their home countries in search of better economic opportunities and a better quality of life. Canada's stable political climate, robust healthcare system, and high standard of living are all factors that make it an attractive destination for immigrants. Immigrants contribute to the Canadian economy not just by filling labour shortages and paying taxes, but also by purchasing commodities, housing, and transportation [@IRCC2022]. Over the years, Canada has experienced a steady increase in permanent immigrant inflow, which has contributed to a significant shift in the demographic makeup of the country. According to Statistics Canada, in 2021, approximately 22% of the Canadian population was foreign-born, up from 20.6% in 2016. This demographic shift has brought many benefits to Canada, including increased cultural diversity and economic growth [@StatCan2021]. Immigrants bring new ideas, skills, and perspectives to the country, which can help drive innovation and create new opportunities for growth and development.
+
+However, the increased pace of permanent immigrant inflow has alarmed some Canadians about the possible impact on the labour market, property costs, and social services. As a result, it is critical for policymakers to ensure that immigration policies benefit both immigrants and the greater Canadian population.
+
+## **Economic factors can influence a country's ability to attract and retain permanent immigrants**.
+
+As we observed in section 3, Canada's employment rate has shown a positive trend over the past decade. Between 2009 and 2019, the employment rate increased steadily from 71.5% to 74.6%, indicating significant growth in employment opportunities in the country.
+
+This growth in employment can be attributed to various factors, such as a stable economy, increased investment, and a growing demand for labor in various sectors. Economic factors can impact a country's capacity to recruit and attract and retain permanent immigrants. Immigrants are often seeking better economic opportunities and a higher standard of living, so countries with robust economies and labour markets are more likely to attract and retain them. The availability of employment and career prospects is one of the most crucial economic elements [@ILO2023]. Immigrants are typically looking for jobs that match their skills and education, and countries that offer a diverse range of job opportunities. Additionally, countries with strong and stable economies tend to have lower rates of unemployment, which can be appealing to immigrants.
+
+The Canadian government has implemented several policies and programs aimed at creating more jobs and supporting economic growth, such as infrastructure investments, tax incentives, and support for small businesses. The steady growth in employment has not only benefited Canadians but has also made Canada a more attractive destination for immigrants. With a strong job market and a high employment rate, immigrants can find ample opportunities to work and contribute to the Canadian economy. The Canadian system has relied on immigration to meet labour market demands for the past three decades. The 2012 Action Plan was regarded to form the foundation for a flexible immigration system, one that would increasingly be structured to suit labour market demands. While this has been a successful method to date, the participants believe that a worldwide scarcity of qualified labour will need major adjustments to Canada's immigration system in the future [@IRCC2021].
+
+However, despite efforts to attract this type of immigrant, Canada continues to face a lack of qualified employees. Immigrants now make up more than one-quarter of Canada's labour force. Since 2010, the proportions of new and recent immigrants in transportation and warehousing, professional services, and lodging and food services have grown the quickest. Recent immigrants accounted for 13% of the overall employed labour force in 2021, but 11% in the accommodation and food services industry, 11% in the professional services sector, and 10% in the manufacturing and transportation sectors [@IRCC2021].
+
+## **Employment rate and its effect on immigration**
+
+In section 4, the model has indicated a positive relationship between employment rate and permanent immigrant inflow, which means that employment rate can influence immigration to Canada. A high employment rate generally makes a nation more appealing to immigrants since it indicates a strong economy with plenty of work prospects. When a country has a low unemployment rate and a robust job market, it can often be challenging to fill all available positions with the local population alone. In such instances, immigration can be critical in filling labour shortages, especially in industries requiring specialized skills and knowledge. When employment is low, however, immigration may encounter more limitations as the country seeks to protect jobs for its residents [@IMF2016]. To prioritize local employment, governments may tighten immigration restrictions, create quotas, or restrict certain types of visas to prioritize local employment. Thus, immigration can disporporationately affect the number of workers in the economy, increasing 'labour supply' in certain occupations and industries [@MigrationObsOxford].
+
+## **Bias and ethical concerns**
+
+One potential bias is the assumption that the relationship between the two variables (employment rate and permanent immigrant inflow) is linear. While linear regression analysis is a useful tool for identifying trends and patterns, it may not accurately reflect the complex and non-linear relationship between employment rate and immigration.
+
+In addition, there is selection bias with the sample of the data collected. We are using the data collected by the Canadian government, which may not accurately reflect the diversity of immigrants in Canada or may omit certain groups that face challenges related to employment and social integration. For example, the analysis may only include immigrants who arrived in Canada through economic immigration programs, which may not capture the full picture of refugees or family-sponsored immigrants. Naturally, using data from a subset of our estimand to analyze the whole estimand will produce biased results.
+
+Measurement bias is also a factor here. The OECD data used to measure employment rate and immigration may be collected using different methods, leading to measurement errors. Additionally, data on immigration status and employment may be self-reported, leading to inaccuracies and inconsistencies. Another potential bias is the choice of variables and data sources used in the analysis. For instance, if the data is limited to a particular time period or geographic region, it may not provide a complete picture of the relationship between employment rate and immigration in Canada.
+
+Furthermore, there are ethical considerations about the interpretation and use of the analytical results. These concerns are important when analyzing the OECD data. The analysis is reliable and does not perpetuate stereotypes or biases against certain groups. For example, using data that only includes highly-skilled immigrants may lead to the exclusion of other immigrants who face systemic barriers to employment and social integration. Other common ethical concerns with surveys relate to privacy, confidentiality and anonymity. Due to the personal nature of data collection, confidentiality and anonymity are essential to preserving the integrity of the participants. Therefore, the data collection should ensure that the data is anonymized and aggregated to protect the privacy of individuals.
+
+## Weaknesses and next steps
+
+Our paper analyzed the relationship between employment rate and permanent immigrant inflows. However, our data only examines the employment rate over the last decade and is insufficient to support the analysis. Therefore, we could expand on the dataset over the last 50 years and can help to better understand how the relationship between employment rate and permanent immigrant inflows has evolved over time in Canada. This can also help to identify any long-term trends or patterns that may not be apparent. To further strengthen our findings, we can incorporate other data sources from other countries with high immigrants such as the USA, UK, and Australia, and compare the data to identify any commonalities or differences in the relationship between employment rate and permanent immigrant inflows across different contexts. Moreover, we can look at additional variables such as wage data to develop a multi-linear regression model to capture the other factors that can influence the relationship between employment rate and permanent immigrant inflows. Finally, we need to consider the potential confounding variables such as the overall state of the Canadian economy when analyzing the relationship between employment rate and permanent immigrant inflows. If the Canadian economy is performing well and experiencing a period of growth, it may lead to both an increase in the employment rate and an increase in permanent immigrant inflows.
+
+\newpage
+
+# References

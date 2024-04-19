@@ -1,8 +1,8 @@
-# Simplify the Model 
+#  Revisiting the generalized linear models for MPs ingestion in fishes
 
 ## Overview
 
-This repo contains the code and data to produce 1) a paper which is a reproduction of https://github.com/GCov/A-Bayesian-analysis-of-the-factors-determining-microplastics-ingestion-in-fishes.git. 2) replications of
+This repo contains the code and data to produce 1) a paper which is a reproduction of https://github.com/GCov/A-Bayesian-analysis-of-the-factors-determining-microplastics-ingestion-in-fishes.git. 2) replications of the generalized linear models and some plots.
 
 ## File Structure
 
@@ -20,15 +20,7 @@ The repo is structured as:
 
 
 
-This repo contains the code and data to produce 1) a paper which is a reproduction of Maya Chin (2023)'s paper, "When Do Politicians Appeal Broadly? The Economic Consequences of Electoral Rules in Braziland" and 2) replications of appendix figures B1, B2a, B2b, and B3 of this paper.
-
-
-
-
 ## LLM Usage
 
 In the development of this paper, a Large Language Model, specifically Chat-GPT3.5, was employed for providing a idea of the coding components and a first draft of narrative composition. The entire chat history can be found in `inputs/llm/usage.txt`.
 
-
-
-https://www.sciencedirect.com/science/article/pii/S030438942100368X#ec0005
