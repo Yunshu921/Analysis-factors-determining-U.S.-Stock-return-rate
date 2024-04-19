@@ -21,5 +21,7 @@ The repo is structured as:
 
 ## LLM Usage
 
-In the development of this paper, a Large Language Model, specifically Chat-GPT3.5, was employed for providing a idea of the coding components and a first draft of narrative composition. The entire chat history can be found in `inputs/llm/usage.txt`.
+In the development of this paper, a Large Language Model, specifically Chat-GPT3.5, was employed for providing a idea of the coding components and a first draft of narrative composition. 
+
+The entire chat history can be found in `inputs/llm/usage.txt`.
 

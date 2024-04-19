@@ -1,7 +1,7 @@
 ---
 title: "Analysis factors determining U.S. Stock return rate"
 author: "Yunshu Zhang"
-thanks: "Code and data are available at:https://github.com/Yunshu921/repro_microplastics_effect_on_fish.git"
+thanks: "Code and data are available at:https://github.com/Yunshu921/Analysis-factors-determining-U.S.-Stock-return-rate.git"
 format: pdf
 abstract: "This paper utilizes data from the World Bank to examine the relationship between U.S. Stock return rate and key indicators. By using linear regression models, it revealed a strong correlation between U.S. Stock return rate and factors such as the price-to-earnings ratio, also known as the PE ratio, is the ratio between a company's stock price and its earnings per share (EPS) and industry category. These findings are significant as they underscore the relationship between monetary policy and broader economic conditions. These findings can provide valuable guidance to investors in understanding the factors influencing Stock return rate in the U.S. and make effective investment strategies."
 editor: visual
